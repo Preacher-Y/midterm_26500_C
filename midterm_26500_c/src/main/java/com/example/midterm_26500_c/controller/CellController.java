@@ -1,11 +1,12 @@
 package com.example.midterm_26500_c.controller;
 
 import com.example.midterm_26500_c.dto.request.CellRequest;
-import com.example.midterm_26500_c.dto.response.CellResponse;
 import com.example.midterm_26500_c.service.CellService;
 import jakarta.validation.Valid;
-import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,28 +26,58 @@ public class CellController {
     private final CellService cellService;
 
     @PostMapping
-    public ResponseEntity<CellResponse> create(@Valid @RequestBody CellRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cellService.create(request));
+    public ResponseEntity<?> create(@Valid @RequestBody CellRequest request) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(cellService.create(request));
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<CellResponse>> getAll() {
-        return ResponseEntity.ok(cellService.getAll());
+    public ResponseEntity<?> getAll() {
+        try {
+            return ResponseEntity.ok(cellService.getAll());
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CellResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(cellService.getById(id));
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(cellService.getById(id));
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CellResponse> update(@PathVariable Long id, @Valid @RequestBody CellRequest request) {
-        return ResponseEntity.ok(cellService.update(id, request));
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody CellRequest request) {
+        try {
+            return ResponseEntity.ok(cellService.update(id, request));
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        cellService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            cellService.delete(id);
+            return ResponseEntity.ok(Map.of("message", "Cell deleted successfully"));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    private ResponseEntity<?> handleException(Exception e) {
+        if (e instanceof BadRequestException) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+        }
+        if (e instanceof NoSuchElementException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
     }
 }

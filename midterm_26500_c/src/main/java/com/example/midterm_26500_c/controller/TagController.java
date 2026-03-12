@@ -1,11 +1,12 @@
 package com.example.midterm_26500_c.controller;
 
 import com.example.midterm_26500_c.dto.request.TagRequest;
-import com.example.midterm_26500_c.dto.response.TagResponse;
 import com.example.midterm_26500_c.service.TagService;
 import jakarta.validation.Valid;
-import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,28 +26,58 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping
-    public ResponseEntity<TagResponse> create(@Valid @RequestBody TagRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(tagService.create(request));
+    public ResponseEntity<?> create(@Valid @RequestBody TagRequest request) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(tagService.create(request));
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<TagResponse>> getAll() {
-        return ResponseEntity.ok(tagService.getAll());
+    public ResponseEntity<?> getAll() {
+        try {
+            return ResponseEntity.ok(tagService.getAll());
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TagResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(tagService.getById(id));
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(tagService.getById(id));
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TagResponse> update(@PathVariable Long id, @Valid @RequestBody TagRequest request) {
-        return ResponseEntity.ok(tagService.update(id, request));
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TagRequest request) {
+        try {
+            return ResponseEntity.ok(tagService.update(id, request));
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        tagService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            tagService.delete(id);
+            return ResponseEntity.ok(Map.of("message", "Tag deleted successfully"));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    private ResponseEntity<?> handleException(Exception e) {
+        if (e instanceof BadRequestException) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+        }
+        if (e instanceof NoSuchElementException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
     }
 }
