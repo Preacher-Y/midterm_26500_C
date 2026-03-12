@@ -8,6 +8,7 @@ import com.example.midterm_26500_c.repository.TagRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,9 +18,9 @@ public class TagService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
 
-    public TagResponse create(TagRequest request) {
+    public TagResponse create(TagRequest request) throws BadRequestException {
         if (tagRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Tag name already exists");
+            throw new BadRequestException("Tag name already exists");
         }
         Tag tag = Tag.builder().name(request.getName()).build();
         return tagMapper.toTagResponse(tagRepository.save(tag));
@@ -35,12 +36,12 @@ public class TagService {
         return tagMapper.toTagResponse(tag);
     }
 
-    public TagResponse update(Long id, TagRequest request) {
+    public TagResponse update(Long id, TagRequest request) throws BadRequestException {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Tag not found with id: " + id));
 
         if (!tag.getName().equals(request.getName()) && tagRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Tag name already exists");
+            throw new BadRequestException("Tag name already exists");
         }
 
         tag.setName(request.getName());

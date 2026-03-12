@@ -10,6 +10,7 @@ import com.example.midterm_26500_c.repository.SectorRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,12 +21,12 @@ public class CellService {
     private final SectorRepository sectorRepository;
     private final LocationMapper locationMapper;
 
-    public CellResponse create(CellRequest request) {
+    public CellResponse create(CellRequest request) throws BadRequestException {
         if (cellRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("Cell code already exists");
+            throw new BadRequestException("Cell code already exists");
         }
         if (cellRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Cell name already exists");
+            throw new BadRequestException("Cell name already exists");
         }
 
         Sector sector = sectorRepository.findById(request.getSectorId())
@@ -50,15 +51,15 @@ public class CellService {
         return locationMapper.toCellResponse(cell);
     }
 
-    public CellResponse update(Long id, CellRequest request) {
+    public CellResponse update(Long id, CellRequest request) throws BadRequestException {
         Cell cell = cellRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Cell not found with id: " + id));
 
         if (!cell.getCode().equals(request.getCode()) && cellRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("Cell code already exists");
+            throw new BadRequestException("Cell code already exists");
         }
         if (!cell.getName().equals(request.getName()) && cellRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Cell name already exists");
+            throw new BadRequestException("Cell name already exists");
         }
 
         Sector sector = sectorRepository.findById(request.getSectorId())

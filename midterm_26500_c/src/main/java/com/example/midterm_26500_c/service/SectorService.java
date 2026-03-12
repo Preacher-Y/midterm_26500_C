@@ -10,6 +10,7 @@ import com.example.midterm_26500_c.repository.SectorRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,12 +21,12 @@ public class SectorService {
     private final DistrictRepository districtRepository;
     private final LocationMapper locationMapper;
 
-    public SectorResponse create(SectorRequest request) {
+    public SectorResponse create(SectorRequest request) throws BadRequestException {
         if (sectorRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("Sector code already exists");
+            throw new BadRequestException("Sector code already exists");
         }
         if (sectorRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Sector name already exists");
+            throw new BadRequestException("Sector name already exists");
         }
 
         District district = districtRepository.findById(request.getDistrictId())
@@ -50,15 +51,15 @@ public class SectorService {
         return locationMapper.toSectorResponse(sector);
     }
 
-    public SectorResponse update(Long id, SectorRequest request) {
+    public SectorResponse update(Long id, SectorRequest request) throws BadRequestException {
         Sector sector = sectorRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Sector not found with id: " + id));
 
         if (!sector.getCode().equals(request.getCode()) && sectorRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("Sector code already exists");
+            throw new BadRequestException("Sector code already exists");
         }
         if (!sector.getName().equals(request.getName()) && sectorRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Sector name already exists");
+            throw new BadRequestException("Sector name already exists");
         }
 
         District district = districtRepository.findById(request.getDistrictId())

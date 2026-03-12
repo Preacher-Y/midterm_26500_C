@@ -10,6 +10,7 @@ import com.example.midterm_26500_c.repository.ProvinceRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,12 +21,12 @@ public class DistrictService {
     private final ProvinceRepository provinceRepository;
     private final LocationMapper locationMapper;
 
-    public DistrictResponse create(DistrictRequest request) {
+    public DistrictResponse create(DistrictRequest request) throws BadRequestException {
         if (districtRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("District code already exists");
+            throw new BadRequestException("District code already exists");
         }
         if (districtRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("District name already exists");
+            throw new BadRequestException("District name already exists");
         }
 
         Province province = provinceRepository.findById(request.getProvinceId())
@@ -50,15 +51,15 @@ public class DistrictService {
         return locationMapper.toDistrictResponse(district);
     }
 
-    public DistrictResponse update(Long id, DistrictRequest request) {
+    public DistrictResponse update(Long id, DistrictRequest request) throws BadRequestException {
         District district = districtRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("District not found with id: " + id));
 
         if (!district.getCode().equals(request.getCode()) && districtRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("District code already exists");
+            throw new BadRequestException("District code already exists");
         }
         if (!district.getName().equals(request.getName()) && districtRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("District name already exists");
+            throw new BadRequestException("District name already exists");
         }
 
         Province province = provinceRepository.findById(request.getProvinceId())

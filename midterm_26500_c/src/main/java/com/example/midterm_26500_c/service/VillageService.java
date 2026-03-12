@@ -10,6 +10,7 @@ import com.example.midterm_26500_c.repository.VillageRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,12 +21,12 @@ public class VillageService {
     private final CellRepository cellRepository;
     private final LocationMapper locationMapper;
 
-    public VillageResponse create(VillageRequest request) {
+    public VillageResponse create(VillageRequest request) throws BadRequestException {
         if (villageRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("Village code already exists");
+            throw new BadRequestException("Village code already exists");
         }
         if (villageRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Village name already exists");
+            throw new BadRequestException("Village name already exists");
         }
 
         Cell cell = cellRepository.findById(request.getCellId())
@@ -50,15 +51,15 @@ public class VillageService {
         return locationMapper.toVillageResponse(village);
     }
 
-    public VillageResponse update(Long id, VillageRequest request) {
+    public VillageResponse update(Long id, VillageRequest request) throws BadRequestException {
         Village village = villageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Village not found with id: " + id));
 
         if (!village.getCode().equals(request.getCode()) && villageRepository.existsByCode(request.getCode())) {
-            throw new IllegalArgumentException("Village code already exists");
+            throw new BadRequestException("Village code already exists");
         }
         if (!village.getName().equals(request.getName()) && villageRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Village name already exists");
+            throw new BadRequestException("Village name already exists");
         }
 
         Cell cell = cellRepository.findById(request.getCellId())
