@@ -24,7 +24,6 @@ public class UserRequest {
     private String phoneNumber;
 
     private String villageCode;
-    private String villageName;
 
     @Valid
     private UserProfileRequest profile;

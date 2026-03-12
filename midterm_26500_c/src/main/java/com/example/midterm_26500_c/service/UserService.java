@@ -14,6 +14,8 @@ import com.example.midterm_26500_c.util.PageResponse;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,12 +31,12 @@ public class UserService {
     private final UserProfileRepository userProfileRepository;
     private final UserMapper userMapper;
 
-    public UserResponse create(UserRequest request) {
+    public UserResponse create(UserRequest request) throws BadRequestException {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new IllegalArgumentException("Phone number already exists");
+            throw new BadRequestException("Phone number already exists");
         }
 
         Village village = resolveVillage(request, true);
@@ -70,15 +72,15 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public UserResponse update(Long id, UserRequest request) {
+    public UserResponse update(Long id, UserRequest request) throws BadRequestException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
 
         if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
         if (!user.getPhoneNumber().equals(request.getPhoneNumber()) && userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new IllegalArgumentException("Phone number already exists");
+            throw new BadRequestException("Phone number already exists");
         }
 
         Village village = resolveVillage(request, false);
@@ -101,12 +103,12 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public List<UserResponse> getByProvince(String provinceCode, String provinceName) {
+    public List<UserResponse> getByProvince(String provinceCode, String provinceName) throws BadRequestException {
         boolean hasCode = StringUtils.hasText(provinceCode);
         boolean hasName = StringUtils.hasText(provinceName);
 
         if (hasCode == hasName) {
-            throw new IllegalArgumentException("Provide either provinceCode or provinceName");
+            throw new BadRequestException("Provide either provinceCode or provinceName");
         }
 
         List<User> users = hasCode
@@ -116,22 +118,18 @@ public class UserService {
         return users.stream().map(userMapper::toUserResponse).toList();
     }
 
-    private Village resolveVillage(UserRequest request, boolean required) {
+    private Village resolveVillage(UserRequest request, boolean required) throws BadRequestException {
         if (StringUtils.hasText(request.getVillageCode())) {
             return villageRepository.findByCode(request.getVillageCode())
                     .orElseThrow(() -> new NoSuchElementException("Village not found with code: " + request.getVillageCode()));
         }
-        if (StringUtils.hasText(request.getVillageName())) {
-            return villageRepository.findByName(request.getVillageName())
-                    .orElseThrow(() -> new NoSuchElementException("Village not found with name: " + request.getVillageName()));
-        }
         if (required) {
-            throw new IllegalArgumentException("villageCode or villageName is required");
+            throw new BadRequestException("villageCode or villageName is required");
         }
         return null;
     }
 
-    private void attachOrUpdateProfile(User user, UserProfileRequest request, boolean creating) {
+    private void attachOrUpdateProfile(User user, UserProfileRequest request, boolean creating) throws BadRequestException {
         if (request == null) {
             return;
         }
@@ -141,7 +139,7 @@ public class UserService {
 
         if (creating) {
             if (userProfileRepository.existsByNationalId(nationalId)) {
-                throw new IllegalArgumentException("National ID already exists");
+                throw new BadRequestException("National ID already exists");
             }
             profile = new UserProfile();
             profile.setUser(user);
@@ -149,14 +147,14 @@ public class UserService {
         } else {
             if (profile == null) {
                 if (userProfileRepository.existsByNationalId(nationalId)) {
-                    throw new IllegalArgumentException("National ID already exists");
+                    throw new BadRequestException("National ID already exists");
                 }
                 profile = new UserProfile();
                 profile.setUser(user);
                 user.setProfile(profile);
             } else if (!profile.getNationalId().equals(nationalId)
                     && userProfileRepository.existsByNationalId(nationalId)) {
-                throw new IllegalArgumentException("National ID already exists");
+                throw new BadRequestException("National ID already exists");
             }
         }
 
