@@ -7,6 +7,7 @@ import com.example.midterm_26500_c.mapper.TagMapper;
 import com.example.midterm_26500_c.repository.TagRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -30,13 +31,13 @@ public class TagService {
         return tagRepository.findAll().stream().map(tagMapper::toTagResponse).toList();
     }
 
-    public TagResponse getById(Long id) {
+    public TagResponse getById(UUID id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Tag not found with id: " + id));
         return tagMapper.toTagResponse(tag);
     }
 
-    public TagResponse update(Long id, TagRequest request) throws BadRequestException {
+    public TagResponse update(UUID id, TagRequest request) throws BadRequestException {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Tag not found with id: " + id));
 
@@ -48,7 +49,7 @@ public class TagService {
         return tagMapper.toTagResponse(tagRepository.save(tag));
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Tag not found with id: " + id));
         tagRepository.delete(tag);

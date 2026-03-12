@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +24,7 @@ public class TaskRequest {
     private LocalDate dueDate;
 
     @NotNull(message = "User ID is required")
-    private Long userId;
+    private UUID userId;
 
-    private Set<Long> tagIds;
+    private Set<UUID> tagIds;
 }

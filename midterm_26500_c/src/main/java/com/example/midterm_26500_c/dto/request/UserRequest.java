@@ -23,8 +23,11 @@ public class UserRequest {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    private String villageCode;
+    private String locationCode;
+
+    private String locationName;
 
     @Valid
+    @NotBlank(message= "The Profile must be filled")
     private UserProfileRequest profile;
 }

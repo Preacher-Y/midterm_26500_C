@@ -5,6 +5,7 @@ import com.example.midterm_26500_c.service.TagService;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(tagService.getById(id));
         } catch (Exception e) {
@@ -53,7 +54,7 @@ public class TagController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TagRequest request) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody TagRequest request) {
         try {
             return ResponseEntity.ok(tagService.update(id, request));
         } catch (Exception e) {
@@ -62,7 +63,7 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {
             tagService.delete(id);
             return ResponseEntity.ok(Map.of("message", "Tag deleted successfully"));

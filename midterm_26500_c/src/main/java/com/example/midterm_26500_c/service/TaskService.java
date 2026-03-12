@@ -13,6 +13,7 @@ import com.example.midterm_26500_c.util.PageResponse;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,13 +59,13 @@ public class TaskService {
                 .build();
     }
 
-    public TaskResponse getById(Long id) {
+    public TaskResponse getById(UUID id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + id));
         return taskMapper.toTaskResponse(task);
     }
 
-    public TaskResponse update(Long id, TaskRequest request) {
+    public TaskResponse update(UUID id, TaskRequest request) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + id));
 
@@ -81,23 +82,23 @@ public class TaskService {
         return taskMapper.toTaskResponse(taskRepository.save(task));
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + id));
         taskRepository.delete(task);
     }
 
-    private User findUser(Long userId) {
+    private User findUser(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
     }
 
-    private Set<Tag> resolveTags(Set<Long> tagIds) {
+    private Set<Tag> resolveTags(Set<UUID> tagIds) {
         Set<Tag> tags = new HashSet<>();
         if (tagIds == null || tagIds.isEmpty()) {
             return tags;
         }
-        for (Long tagId : tagIds) {
+        for (UUID tagId : tagIds) {
             Tag tag = tagRepository.findById(tagId)
                     .orElseThrow(() -> new NoSuchElementException("Tag not found with id: " + tagId));
             tags.add(tag);

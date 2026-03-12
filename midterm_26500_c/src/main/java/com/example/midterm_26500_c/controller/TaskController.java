@@ -5,6 +5,7 @@ import com.example.midterm_26500_c.service.TaskService;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(taskService.getById(id));
         } catch (Exception e) {
@@ -59,7 +60,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TaskRequest request) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody TaskRequest request) {
         try {
             return ResponseEntity.ok(taskService.update(id, request));
         } catch (Exception e) {
@@ -68,7 +69,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {
             taskService.delete(id);
             return ResponseEntity.ok(Map.of("message", "Task deleted successfully"));

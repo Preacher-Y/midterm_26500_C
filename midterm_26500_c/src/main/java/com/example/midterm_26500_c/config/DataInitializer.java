@@ -1,23 +1,16 @@
 package com.example.midterm_26500_c.config;
 
-import com.example.midterm_26500_c.entity.Cell;
-import com.example.midterm_26500_c.entity.District;
-import com.example.midterm_26500_c.entity.Province;
-import com.example.midterm_26500_c.entity.Sector;
+import com.example.midterm_26500_c.entity.Location;
 import com.example.midterm_26500_c.entity.Tag;
 import com.example.midterm_26500_c.entity.Task;
 import com.example.midterm_26500_c.entity.User;
 import com.example.midterm_26500_c.entity.UserProfile;
-import com.example.midterm_26500_c.entity.Village;
+import com.example.midterm_26500_c.enums.LocationType;
 import com.example.midterm_26500_c.enums.TaskStatus;
-import com.example.midterm_26500_c.repository.CellRepository;
-import com.example.midterm_26500_c.repository.DistrictRepository;
-import com.example.midterm_26500_c.repository.ProvinceRepository;
-import com.example.midterm_26500_c.repository.SectorRepository;
+import com.example.midterm_26500_c.repository.LocationRepository;
 import com.example.midterm_26500_c.repository.TagRepository;
 import com.example.midterm_26500_c.repository.TaskRepository;
 import com.example.midterm_26500_c.repository.UserRepository;
-import com.example.midterm_26500_c.repository.VillageRepository;
 import java.time.LocalDate;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +22,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class DataInitializer {
 
-    private final ProvinceRepository provinceRepository;
-    private final DistrictRepository districtRepository;
-    private final SectorRepository sectorRepository;
-    private final CellRepository cellRepository;
-    private final VillageRepository villageRepository;
+    private final LocationRepository locationRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final TaskRepository taskRepository;
@@ -41,23 +30,23 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner seedData() {
         return args -> {
-            if (provinceRepository.count() > 0) {
+            if (locationRepository.count() > 0) {
                 return;
             }
 
-            Province kigali = provinceRepository.save(Province.builder().code("01").name("Kigali City").build());
-            District gasabo = districtRepository.save(District.builder().code("0101").name("Gasabo").province(kigali).build());
-            Sector remera = sectorRepository.save(Sector.builder().code("010101").name("Remera").district(gasabo).build());
-            Cell rukiriOne = cellRepository.save(Cell.builder().code("01010101").name("Rukiri I").sector(remera).build());
-            Village nyabisindu = villageRepository.save(Village.builder().code("0101010101").name("Nyabisindu").cell(rukiriOne).build());
-            villageRepository.save(Village.builder().code("0101010102").name("Rukiri Village").cell(rukiriOne).build());
+            Location kigali = locationRepository.save(Location.builder().code("KGL").name("Kigali").type(LocationType.PROVINCE).build());
+            Location gasabo = locationRepository.save(Location.builder().code("GAS").name("Gasabo").type(LocationType.DISTRICT).parent(kigali).build());
+            Location kimironko = locationRepository.save(Location.builder().code("KIM").name("Kimironko").type(LocationType.SECTOR).parent(gasabo).build());
+            Location kibagabaga = locationRepository.save(Location.builder().code("KIB").name("Kibagabaga").type(LocationType.CELL).parent(kimironko).build());
+            Location umuduguduOne = locationRepository.save(Location.builder().code("V01").name("Umudugudu wa 1").type(LocationType.VILLAGE).parent(kibagabaga).build());
+            locationRepository.save(Location.builder().code("V02").name("Umudugudu wa 2").type(LocationType.VILLAGE).parent(kibagabaga).build());
 
-            Province eastern = provinceRepository.save(Province.builder().code("02").name("Eastern Province").build());
-            District rwamagana = districtRepository.save(District.builder().code("0201").name("Rwamagana").province(eastern).build());
-            Sector kigabiro = sectorRepository.save(Sector.builder().code("020101").name("Kigabiro").district(rwamagana).build());
-            Cell nyagasenyi = cellRepository.save(Cell.builder().code("02010101").name("Nyagasenyi").sector(kigabiro).build());
-            villageRepository.save(Village.builder().code("0201010101").name("Munyinya").cell(nyagasenyi).build());
-            villageRepository.save(Village.builder().code("0201010102").name("Kabeza").cell(nyagasenyi).build());
+            Location northern = locationRepository.save(Location.builder().code("NTH").name("Northern").type(LocationType.PROVINCE).build());
+            Location musanze = locationRepository.save(Location.builder().code("MSZ").name("Musanze").type(LocationType.DISTRICT).parent(northern).build());
+            Location muhoza = locationRepository.save(Location.builder().code("MHZ").name("Muhoza").type(LocationType.SECTOR).parent(musanze).build());
+            Location cyivugiza = locationRepository.save(Location.builder().code("CYV").name("Cyivugiza").type(LocationType.CELL).parent(muhoza).build());
+            locationRepository.save(Location.builder().code("V03").name("Umudugudu wa 3").type(LocationType.VILLAGE).parent(cyivugiza).build());
+            locationRepository.save(Location.builder().code("V04").name("Umudugudu wa 4").type(LocationType.VILLAGE).parent(cyivugiza).build());
 
             Tag backend = tagRepository.save(Tag.builder().name("Backend").build());
             Tag urgent = tagRepository.save(Tag.builder().name("Urgent").build());
@@ -67,7 +56,7 @@ public class DataInitializer {
                     .lastName("Uwimana")
                     .email("aline.uwimana@example.com")
                     .phoneNumber("250788111222")
-                    .village(nyabisindu)
+                    .location(umuduguduOne)
                     .build();
 
             UserProfile profile = UserProfile.builder()

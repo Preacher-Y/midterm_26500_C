@@ -1,10 +1,11 @@
 package com.example.midterm_26500_c.controller;
 
-import com.example.midterm_26500_c.dto.request.CellRequest;
-import com.example.midterm_26500_c.service.CellService;
+import com.example.midterm_26500_c.dto.request.LocationRequest;
+import com.example.midterm_26500_c.service.LocationService;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -19,16 +20,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/cells")
+@RequestMapping("/api/locations")
 @RequiredArgsConstructor
-public class CellController {
+public class LocationController {
 
-    private final CellService cellService;
+    private final LocationService locationService;
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CellRequest request) {
+    public ResponseEntity<?> create(@Valid @RequestBody LocationRequest request) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(cellService.create(request));
+            return ResponseEntity.status(HttpStatus.CREATED).body(locationService.create(request));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -37,35 +38,35 @@ public class CellController {
     @GetMapping
     public ResponseEntity<?> getAll() {
         try {
-            return ResponseEntity.ok(cellService.getAll());
+            return ResponseEntity.ok(locationService.getAll());
         } catch (Exception e) {
             return handleException(e);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable UUID id) {
         try {
-            return ResponseEntity.ok(cellService.getById(id));
+            return ResponseEntity.ok(locationService.getById(id));
         } catch (Exception e) {
             return handleException(e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody CellRequest request) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody LocationRequest request) {
         try {
-            return ResponseEntity.ok(cellService.update(id, request));
+            return ResponseEntity.ok(locationService.update(id, request));
         } catch (Exception e) {
             return handleException(e);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {
-            cellService.delete(id);
-            return ResponseEntity.ok(Map.of("message", "Cell deleted successfully"));
+            locationService.delete(id);
+            return ResponseEntity.ok(Map.of("message", "Location deleted successfully"));
         } catch (Exception e) {
             return handleException(e);
         }

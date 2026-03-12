@@ -5,6 +5,7 @@ import com.example.midterm_26500_c.service.UserService;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(userService.getById(id));
         } catch (Exception e) {
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody UserRequest request) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody UserRequest request) {
         try {
             return ResponseEntity.ok(userService.update(id, request));
         } catch (Exception e) {
@@ -68,7 +69,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {
             userService.delete(id);
             return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
@@ -77,13 +78,13 @@ public class UserController {
         }
     }
 
-    @GetMapping("/by-province")
-    public ResponseEntity<?> getByProvince(
-            @RequestParam(required = false) String provinceCode,
-            @RequestParam(required = false) String provinceName
+    @GetMapping("/by-location")
+    public ResponseEntity<?> getByLocation(
+            @RequestParam(required = false) String locationCode,
+            @RequestParam(required = false) String locationName
     ) {
         try {
-            return ResponseEntity.ok(userService.getByProvince(provinceCode, provinceName));
+            return ResponseEntity.ok(userService.getByLocation(locationCode, locationName));
         } catch (Exception e) {
             return handleException(e);
         }

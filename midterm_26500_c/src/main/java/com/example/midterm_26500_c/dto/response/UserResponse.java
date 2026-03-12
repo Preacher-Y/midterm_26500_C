@@ -1,22 +1,26 @@
 package com.example.midterm_26500_c.dto.response;
 
+import com.example.midterm_26500_c.enums.LocationType;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class UserResponse {
-    private Long id;
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
-    private String villageCode;
-    private String villageName;
-    private String cellName;
-    private String sectorName;
-    private String districtName;
-    private String provinceCode;
+    private UUID locationId;
+    private String locationCode;
+    private String locationName;
+    private LocationType locationType;
     private String provinceName;
+    private String districtName;
+    private String sectorName;
+    private String cellName;
+    private String villageName;
     private UserProfileResponse profile;
 }
